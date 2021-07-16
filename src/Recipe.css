@@ -1,0 +1,15 @@
+.recipe-list {
+    width: 500px;
+    margin: 0 auto;
+}
+.recipe {
+    border: 2px solid #003097;
+    margin-top: 1.5rem;
+}
+.recipe:hover {
+    background: #1d2c3c;
+    border-color: #1d2c3c;
+    color: white;
+    cursor: pointer;
+    transition: all 0.125s ease-in-out
+}
