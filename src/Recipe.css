@@ -1,10 +1,12 @@
 .recipe-list {
-    width: 500px;
     margin: 0 auto;
+    width: fit-content;
 }
 .recipe {
+    padding: 1rem;
     border: 2px solid #003097;
     margin-top: 1.5rem;
+    text-align: left;
 }
 .recipe:hover {
     background: #1d2c3c;
@@ -12,4 +14,27 @@
     color: white;
     cursor: pointer;
     transition: all 0.125s ease-in-out
+}
+p {
+    margin: 0.25rem 0;
+}
+p.name {
+    font-weight: bold;
+}
+.ingredients {
+    margin-top: 1rem;
+}
+span.ingredient {
+    padding: 0.5rem;
+    margin-right: 0.2rem;
+    border-radius: 8px;
+    background: green;
+    color: white;
+}
+.buttons {
+    margin-top: 1rem;
+    display: flex;
+}
+.buttons button, .buttons input {
+    flex-basis: 50%;
 }
