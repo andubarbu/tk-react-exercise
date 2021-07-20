@@ -4,7 +4,8 @@
 }
 .recipe {
     padding: 1rem;
-    border: 2px solid #003097;
+    border: 1px solid #003097;
+    border-radius: 5px;
     margin-top: 1.5rem;
     text-align: left;
 }

@@ -1,33 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import Recipe from './Recipe';
+import { get, post, patch, destroy } from './api';
 import './Recipe.css';
 
 const RecipeList = () => {
     // State
-    let [recipes, setRecipes] = useState({});
+    let [recipes, setRecipes] = useState([]);
     let [haveData, setHaveData] = useState(false);
     let [formShown, setFormShown] = useState(false);
 
     // Fetch all recipes from server
+    const getData = () => {
+        get().then((data) => {
+            setRecipes(data);
+            setHaveData(true);
+        });
+    }
     useEffect(() => {
-        const getData = async () => {
-            await fetch("http://0.0.0.0:8000/recipes/", {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            })
-                .then((response) => response.json())
-                .then((data) => {
-                    setRecipes(data);
-                    setHaveData(true);
-                });
-        }
         getData();
-    }, [haveData]);
+    }, []);
 
     // Add a recipe
-    const newRecipe = async (e) => {
+    const newRecipe = (e) => {
         e.preventDefault();
         let ingredients = [];
         const ingredientsArray = document.querySelector("#ingredients").value.split(",");
@@ -39,69 +33,49 @@ const RecipeList = () => {
         }
         console.log(payload);
         console.log("Sending POST...")
-        await fetch("http://0.0.0.0:8000/recipes/", {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(payload)
-            })
-                .then((response) => response.json())
-                .then((data) => {
-                    console.log(data);
-                    let updatedRecipes = [...recipes];
-                    updatedRecipes.push(data);
-                    setRecipes(updatedRecipes);
-                    document.querySelector("form").reset();
-                    setFormShown(false);
-                });
+        post(payload).then((data) => {
+            console.log(data);
+            let updatedRecipes = [...recipes];
+            updatedRecipes.push(data);
+            setRecipes(updatedRecipes);
+            document.querySelector("form").reset();
+            setFormShown(false);
+        });
     }
 
     // Edit a recipe
-    const editRecipe = async (recipeId, payload) => {
+    const editRecipe = (payload) => {
 
         const changeRecipeDetails = () => {
             let interimRecipes = [...recipes];
-            let index = recipes.findIndex(recipe => recipe.id === recipeId);
+            let index = recipes.findIndex(recipe => recipe.id === payload.id);
             interimRecipes[index] = payload;
             setRecipes(interimRecipes);
         }
         console.log(JSON.stringify(payload));
-        await fetch("http://0.0.0.0:8000/recipes/" + recipeId + "/", {
-            method: 'PATCH',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(payload)
-        })
-            .then((response) => {
-                console.log("Status: " + response.status + " " + response.statusText);
-                if (response.status === 200) {
-                    changeRecipeDetails();
-                } else {
-                    alert("Error editing recipe");
-                }
-            });
+        patch(payload).then((response) => {
+            console.log("Status: " + response.status + " " + response.statusText);
+            if (response.status === 200) {
+                changeRecipeDetails();
+                console.log(response)
+            } else {
+                alert("Error editing recipe");
+            }
+        });
     }
 
     // Remove a recipe
-    const removeRecipe = async (recipeId) => {
+    const removeRecipe = (recipeId) => {
         console.log("Sending delete request...")
-        await fetch("http://0.0.0.0:8000/recipes/" + recipeId + "/", {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        })
-            .then((response) => {
-                console.log("Status: " + response.status + " " + response.statusText);
-                if (response.status === 204) {
-                    const updatedRecipes = recipes.filter(recipe => recipe.id !== recipeId);
-                    setRecipes(updatedRecipes);
-                } else {
-                    alert("Error deleting recipe");
-                }
-            });
+        destroy(recipeId).then((response) => {
+            console.log("Status: " + response.status + " " + response.statusText);
+            if (response.status === 204) {
+                const updatedRecipes = recipes.filter(recipe => recipe.id !== recipeId);
+                setRecipes(updatedRecipes);
+            } else {
+                alert("Error deleting recipe");
+            }
+        });
     }
 
     // Render
@@ -111,23 +85,23 @@ const RecipeList = () => {
         )
     } else {
         return (
-            <div className="recipe-list">
+            <div className="recipe-list" data-testid="recipe-list">
                 <h1>Your recipes</h1>
 
                 <button onClick={(() => setFormShown(true))}>Add new</button>
 
-                {recipes.map((val) => {
+                {recipes ? recipes.map((val) => {
                     return <Recipe recipe={val} key={val.id} remove={removeRecipe} edit={editRecipe} />;
-                })}
+                }) : ''}
 
                 {formShown ? (
                     <form className="recipe form" onSubmit={(e) => newRecipe(e)}>
-                        <input type="text" name="name" id="name" placeholder="name" required />
-                        <input type="text" name="description" id="description" placeholder="description" required />
+                        <input type="text" name="name" id="name" placeholder="name" data-testid="addnew-name" required />
+                        <input type="text" name="description" id="description" placeholder="description" data-testid="addnew-description" required />
                         <p>Ingredients: (Separate with comma)</p><br />
-                        <textarea name="ingredients" id="ingredients" cols="30" rows="4" required></textarea><br />
+                        <textarea name="ingredients" id="ingredients" cols="30" rows="4" data-testid="addnew-ingredients" required></textarea><br />
                         <div className="buttons">
-                            <input type="submit" />
+                            <input type="submit" value="Submit" />
                             <button onClick={(() => setFormShown(false))}>Cancel</button>
                         </div>
                     </form>

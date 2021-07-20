@@ -31,15 +31,15 @@ const Recipe = props => {
             description: getInputValue("description"),
             ingredients: ingredients,
         }
-        props.edit(recipe.id, payload);
         console.log(payload);
+        props.edit(payload);
         setIsEditing(false);
     }
 
     if (isEditing) {
         return (
-            <div className="recipe form">
-                <input type="text" name="name" id="name" placeholder="name" />
+            <div className="recipe form" data-testid="recipe-form">
+                <input type="text" name="name" id="name" placeholder="name" data-testid="name" />
                 <input type="text" name="description" id="description" placeholder="description" />
                 <p>Ingredients: (Separate with comma)</p><br />
                 <textarea name="ingredients" id="ingredients" cols="30" rows="4"></textarea><br />
@@ -51,8 +51,8 @@ const Recipe = props => {
         );
     } else {
         return (
-            <div className="recipe">
-                <p className="name">{recipe.name}</p>
+            <div className="recipe" data-testid={`recipe-${recipe.id}`}>
+                <p className="name" data-testid="name">{recipe.name}</p>
                 <p className="description">{recipe.description}</p>
                 <div className="ingredients">{recipe.ingredients.map((val, idx) => {
                     return <span className="ingredient" key={idx}>{val.name}</span>
