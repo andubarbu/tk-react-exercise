@@ -31,10 +31,7 @@ const RecipeList = () => {
             description: document.querySelector("#description").value,
             ingredients: ingredients,
         }
-        console.log(payload);
-        console.log("Sending POST...")
         post(payload).then((data) => {
-            console.log(data);
             let updatedRecipes = [...recipes];
             updatedRecipes.push(data);
             setRecipes(updatedRecipes);
@@ -52,12 +49,9 @@ const RecipeList = () => {
             interimRecipes[index] = payload;
             setRecipes(interimRecipes);
         }
-        console.log(JSON.stringify(payload));
         patch(payload).then((response) => {
-            console.log("Status: " + response.status + " " + response.statusText);
             if (response.status === 200) {
                 changeRecipeDetails();
-                console.log(response)
             } else {
                 alert("Error editing recipe");
             }
@@ -66,9 +60,7 @@ const RecipeList = () => {
 
     // Remove a recipe
     const removeRecipe = (recipeId) => {
-        console.log("Sending delete request...")
         destroy(recipeId).then((response) => {
-            console.log("Status: " + response.status + " " + response.statusText);
             if (response.status === 204) {
                 const updatedRecipes = recipes.filter(recipe => recipe.id !== recipeId);
                 setRecipes(updatedRecipes);

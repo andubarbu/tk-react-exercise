@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import './Recipe.css';
 
 const Recipe = props => {
-    let recipe = props.recipe;
+    const { recipe } = props;
     let [isEditing, setIsEditing] = useState(false);
 
     const getInputValue = inputId => {
@@ -18,7 +18,6 @@ const Recipe = props => {
     };
 
     const handleEdit = () => {
-        console.log("Creating payload..");
         let ingredients = recipe.ingredients;
         if (document.querySelector("#ingredients").value) {
             ingredients = [];
@@ -31,7 +30,6 @@ const Recipe = props => {
             description: getInputValue("description"),
             ingredients: ingredients,
         }
-        console.log(payload);
         props.edit(payload);
         setIsEditing(false);
     }
