@@ -14,8 +14,10 @@ const fakeResponse = {
 }
 
 beforeEach(() => {
+    get.mockReset()
     get.mockResolvedValue([fakeResponse]);
 })
+
 
 test('Renders expected info when API responds to initial call', async () => {
     render(<RecipeList />)

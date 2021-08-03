@@ -16,6 +16,7 @@ const RecipeList = () => {
             setHaveData(true);
         });
     }
+
     useEffect(() => {
         getData();
     }, []);
@@ -23,9 +24,8 @@ const RecipeList = () => {
     // Add a recipe
     const newRecipe = (e) => {
         e.preventDefault();
-        let ingredients = [];
         const ingredientsArray = document.querySelector("#ingredients").value.split(",");
-        ingredientsArray.map((val) => ingredients.push({ "name": val }));
+        let ingredients = ingredientsArray.map((val) => ({ "name": val }));
         const payload = {
             name: document.querySelector("#name").value,
             description: document.querySelector("#description").value,
@@ -41,33 +41,21 @@ const RecipeList = () => {
     }
 
     // Edit a recipe
-    const editRecipe = (payload) => {
+    const editRecipe = (payload) => patch(payload);
 
-        const changeRecipeDetails = () => {
-            let interimRecipes = [...recipes];
-            let index = recipes.findIndex(recipe => recipe.id === payload.id);
-            interimRecipes[index] = payload;
-            setRecipes(interimRecipes);
-        }
-        patch(payload).then((response) => {
-            if (response.status === 200) {
-                changeRecipeDetails();
-            } else {
-                alert("Error editing recipe");
-            }
-        });
+    const changeRecipeDetails = (payload) => {
+        let interimRecipes = [...recipes];
+        let index = recipes.findIndex(recipe => recipe.id === payload.id);
+        interimRecipes[index] = payload;
+        setRecipes(interimRecipes);
     }
 
     // Remove a recipe
-    const removeRecipe = (recipeId) => {
-        destroy(recipeId).then((response) => {
-            if (response.status === 204) {
-                const updatedRecipes = recipes.filter(recipe => recipe.id !== recipeId);
-                setRecipes(updatedRecipes);
-            } else {
-                alert("Error deleting recipe");
-            }
-        });
+    const removeRecipe = (recipeId) => destroy(recipeId);
+
+    const removeRecipeFromList = (recipeId) => {
+        const updatedRecipes = recipes.filter(recipe => recipe.id !== recipeId);
+        setRecipes(updatedRecipes);
     }
 
     // Render
@@ -82,16 +70,49 @@ const RecipeList = () => {
 
                 <button onClick={(() => setFormShown(true))}>Add new</button>
 
-                {recipes ? recipes.map((val) => {
-                    return <Recipe recipe={val} key={val.id} remove={removeRecipe} edit={editRecipe} />;
-                }) : ''}
+                {recipes.map((val) => {
+                    return (
+                        <Recipe 
+                            recipe={val} 
+                            key={val.id} 
+                            remove={removeRecipe} 
+                            edit={editRecipe} 
+                            update={changeRecipeDetails}
+                            updateList={removeRecipeFromList}
+                        />);
+                })}
 
                 {formShown ? (
                     <form className="recipe form" onSubmit={(e) => newRecipe(e)}>
-                        <input type="text" name="name" id="name" placeholder="name" data-testid="addnew-name" required />
-                        <input type="text" name="description" id="description" placeholder="description" data-testid="addnew-description" required />
+
+                        <input
+                            type="text"
+                            name="name"
+                            id="name"
+                            placeholder="name"
+                            data-testid="addnew-name"
+                            required />
+
+                        <input
+                            type="text"
+                            name="description"
+                            id="description"
+                            placeholder="description"
+                            data-testid="addnew-description"
+                            required />
+
                         <p>Ingredients: (Separate with comma)</p><br />
-                        <textarea name="ingredients" id="ingredients" cols="30" rows="4" data-testid="addnew-ingredients" required></textarea><br />
+
+                        <textarea
+                            name="ingredients"
+                            id="ingredients"
+                            cols="30" rows="4"
+                            data-testid="addnew-ingredients"
+                            required>
+                        </textarea>
+
+                        <br />
+
                         <div className="buttons">
                             <input type="submit" value="Submit" />
                             <button onClick={(() => setFormShown(false))}>Cancel</button>
