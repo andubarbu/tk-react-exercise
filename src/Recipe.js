@@ -11,7 +11,7 @@ const Recipe = props => {
     let [formValues, setFormValues] = useState({
         name: recipe.name,
         description: recipe.description,
-        ingredients: recipe.ingredients.map((val) => val.name)
+        ingredients: recipe.ingredients.map((val) => val.name).join(",")
     });
 
     const handleDelete = () => {
