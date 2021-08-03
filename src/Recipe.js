@@ -11,10 +11,8 @@ const Recipe = props => {
     let [formValues, setFormValues] = useState({
         name: recipe.name,
         description: recipe.description,
-        ingredients: recipe.ingredients
-    })
-
-    let [ingredientStr, setIngredientStr] = useState(formValues.ingredients.map((item) => item.name).join());
+        ingredients: recipe.ingredients.map((val) => val.name)
+    });
 
     const handleDelete = () => {
         remove(recipe.id).then((response) => {
@@ -28,15 +26,23 @@ const Recipe = props => {
 
     const handleEdit = () => {
         setIsPatching(true);
-        console.log({...formValues, id:recipe.id});
-        edit({...formValues, id:recipe.id}).then((response) => {
-            setIsPatching(false);
-            if (response.status === 200) {
-                update({...formValues, id:recipe.id});
-            } else {
-                alert("Error editing recipe");
-            }
-        });
+        edit({
+            ...formValues,
+            id: recipe.id,
+            ingredients: formValues.ingredients.split(",").map((val) => ({ "name": val }))
+        })
+            .then((response) => {
+                setIsPatching(false);
+                if (response.status === 200) {
+                    update({
+                        ...formValues,
+                        id: recipe.id,
+                        ingredients: formValues.ingredients.split(",").map((val) => ({ "name": val }))
+                    });
+                } else {
+                    alert("Error editing recipe");
+                }
+            });
         setIsEditing(false);
     }
 
@@ -44,47 +50,38 @@ const Recipe = props => {
         if (!isPatching) {
             return (
                 <div className="recipe form" data-testid="recipe-form">
-    
-                    <input 
-                    type="text" 
-                    name="name" 
-                    id="name" 
-                    placeholder="name" 
-                    data-testid="name" 
-                    value={formValues.name} 
-                    onChange={((event) => setFormValues({...formValues, name:event.target.value}))}
+
+                    <input
+                        type="text"
+                        name="name"
+                        id="name"
+                        placeholder="name"
+                        data-testid="name"
+                        value={formValues.name}
+                        onChange={((event) => setFormValues({ ...formValues, name: event.target.value }))}
                     />
-    
-                    <input 
-                    type="text" 
-                    name="description" 
-                    id="description" 
-                    placeholder="description" 
-                    value={formValues.description} 
-                    onChange={((event) => setFormValues({...formValues, description:event.value}))} 
+
+                    <input
+                        type="text"
+                        name="description"
+                        id="description"
+                        placeholder="description"
+                        value={formValues.description}
+                        onChange={((event) => setFormValues({ ...formValues, description: event.target.value }))}
                     />
-    
+
                     <p>Ingredients: (Separate with comma)</p><br />
-    
-                    <textarea 
-                    name="ingredients" 
-                    id="ingredients" 
-                    cols="30" rows="4" 
-                    value={ingredientStr}
-                    onChange={((event) => {
-                        const str = event.target.value;
-                        setIngredientStr(str);
-                        if (str[str.length-1] !== ",") {
-                            let arr = str.split(",");
-                            arr = arr.map((item) => ({name: item}));
-                            setFormValues({...formValues, ingredients:arr})
-                        }
-                    })}
-                    >
+
+                    <textarea
+                        name="ingredients"
+                        id="ingredients"
+                        cols="30" rows="4"
+                        value={formValues.ingredients}
+                        onChange={((event) => setFormValues({ ...formValues, ingredients: event.target.value }))}>
                     </textarea>
-                    
+
                     <br />
-    
+
                     <div className="buttons">
                         <button onClick={handleEdit}>Done</button>
                         <button onClick={(() => setIsEditing(false))}>Cancel</button>

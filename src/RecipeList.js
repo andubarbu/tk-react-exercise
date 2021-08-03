@@ -9,6 +9,12 @@ const RecipeList = () => {
     let [haveData, setHaveData] = useState(false);
     let [formShown, setFormShown] = useState(false);
 
+    let [formValues, setFormValues] = useState({
+        name: "",
+        description: "",
+        ingredients: "",
+    })
+
     // Fetch all recipes from server
     const getData = () => {
         get().then((data) => {
@@ -24,12 +30,10 @@ const RecipeList = () => {
     // Add a recipe
     const newRecipe = (e) => {
         e.preventDefault();
-        const ingredientsArray = document.querySelector("#ingredients").value.split(",");
-        let ingredients = ingredientsArray.map((val) => ({ "name": val }));
         const payload = {
-            name: document.querySelector("#name").value,
-            description: document.querySelector("#description").value,
-            ingredients: ingredients,
+            name: formValues.name,
+            description: formValues.description,
+            ingredients: formValues.ingredients.split(",").map((val) => ({ "name": val })),
         }
         post(payload).then((data) => {
             let updatedRecipes = [...recipes];
@@ -72,11 +76,11 @@ const RecipeList = () => {
 
                 {recipes.map((val) => {
                     return (
-                        <Recipe 
-                            recipe={val} 
-                            key={val.id} 
-                            remove={removeRecipe} 
-                            edit={editRecipe} 
+                        <Recipe
+                            recipe={val}
+                            key={val.id}
+                            remove={removeRecipe}
+                            edit={editRecipe}
                             update={changeRecipeDetails}
                             updateList={removeRecipeFromList}
                         />);
@@ -91,7 +95,9 @@ const RecipeList = () => {
                             id="name"
                             placeholder="name"
                             data-testid="addnew-name"
-                            required />
+                            required
+                            value={formValues.name}
+                            onChange={((event) => setFormValues({ ...formValues, name: event.target.value }))} />
 
                         <input
                             type="text"
@@ -99,7 +105,9 @@ const RecipeList = () => {
                             id="description"
                             placeholder="description"
                             data-testid="addnew-description"
-                            required />
+                            required
+                            value={formValues.description}
+                            onChange={((event) => setFormValues({ ...formValues, description: event.target.value }))} />
 
                         <p>Ingredients: (Separate with comma)</p><br />
 
@@ -108,7 +116,9 @@ const RecipeList = () => {
                             id="ingredients"
                             cols="30" rows="4"
                             data-testid="addnew-ingredients"
-                            required>
+                            required
+                            value={formValues.ingredients}
+                            onChange={((event) => setFormValues({ ...formValues, ingredients: event.target.value }))}>
                         </textarea>
 
                         <br />
