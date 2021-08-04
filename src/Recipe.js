@@ -8,6 +8,7 @@ export const RecipeContainer = styled.div`
   border-radius: 5px;
   margin-top: 1.5rem;
   text-align: left;
+  max-width: 30rem;
   :hover {
     background: #1d2c3c;
     border-color: #1d2c3c;
